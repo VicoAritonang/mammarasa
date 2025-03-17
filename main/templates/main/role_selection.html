@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Select Role - Mamma Rasa{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>Select Your Role</h1>
+        <p>Please select your role to continue.</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <div class="role-options">
+                {% for radio in form.role %}
+                <div class="form-check mb-3">
+                    {{ radio.tag }}
+                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                        {{ radio.choice_label }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            {% if form.role.errors %}
+                <div class="text-danger">
+                    {{ form.role.errors }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Continue</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .role-options {
+        margin: 20px 0;
+    }
+    .form-check-label {
+        font-size: 1.1rem;
+        margin-left: 10px;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Verify OTP - Mamma Rasa{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>Verify OTP</h1>
+        <p>We've sent a verification code to your email. Please enter it below.</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_otp">OTP Code:</label>
+            {{ form.otp }}
+            {% if form.otp.errors %}
+                <div class="text-danger">
+                    {{ form.otp.errors }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Verify OTP</button>
+        </div>
+    </form>
+    
+    <div class="auth-footer">
+        <p>Didn't receive the code? <a href="{% url 'resend_otp' %}">Resend OTP</a></p>
+    </div>
+</div>
+{% endblock %} 

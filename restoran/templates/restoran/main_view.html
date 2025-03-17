@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restoran.nama_restoran }} - Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding-bottom: 70px; /* Space for fixed cart button */
+        }
+        .navbar {
+            background-color: #ff6b6b;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            color: #fff;
+        }
+        .navbar-nav .nav-link {
+            color: #fff;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background-color: #fff;
+            margin-bottom: 20px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .menu-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .menu-list {
+            flex: 1;
+            min-width: 0;
+            padding-right: 20px;
+        }
+        .cart-container {
+            width: 350px;
+            position: sticky;
+            top: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .menu-item {
+            display: flex;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+        .menu-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .menu-details {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .menu-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .menu-description {
+            color: #666;
+            flex: 1;
+        }
+        .menu-price {
+            width: 120px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-left: 1px solid #eee;
+        }
+        .price-value {
+            color: #ff6b6b;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .btn-add-cart {
+            background-color: #ff6b6b;
+            border-color: #ff6b6b;
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        .btn-add-cart:hover {
+            background-color: #ff5252;
+            border-color: #ff5252;
+        }
+        .cart-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-empty {
+            text-align: center;
+            color: #666;
+            padding: 20px 0;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item-name {
+            flex: 1;
+        }
+        .cart-item-price {
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .cart-quantity {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        .cart-quantity-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .cart-quantity-value {
+            margin: 0 5px;
+            width: 30px;
+            text-align: center;
+        }
+        .cart-subtotal {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .cart-actions {
+            margin-top: 20px;
+        }
+        .btn-checkout {
+            background-color: #ff6b6b;
+            border-color: #ff6b6b;
+            width: 100%;
+        }
+        .btn-checkout:hover {
+            background-color: #ff5252;
+            border-color: #ff5252;
+        }
+        .mobile-cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6b6b;
+            color: #fff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .mobile-cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc3545;
+            color: #fff;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 991px) {
+            .menu-container {
+                flex-direction: column;
+            }
+            .menu-list {
+                padding-right: 0;
+            }
+            .cart-container {
+                width: 100%;
+                margin-top: 20px;
+                position: static;
+                display: none;
+            }
+            .mobile-cart-btn {
+                display: flex;
+            }
+            .menu-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Mamma Rasa</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% if user.role == 'buyer' %}{% url 'buyer_page' %}{% elif user.role == 'restoran' %}{% url 'restoran_page' %}{% endif %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="header">
+        <div class="container">
+            <h1>Welcome to {{ restoran.nama_restoran }}</h1>
+            <p>Explore our delicious menu and place your order</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="menu-container">
+            <div class="menu-list">
+                {% if menus %}
+                    {% for menu in menus %}
+                        <div class="menu-item">
+                            {% if menu.foto_makanan %}
+                                <img src="{{ menu.foto_makanan.url }}" alt="{{ menu.nama_menu }}" class="menu-image">
+                            {% else %}
+                                <img src="https://via.placeholder.com/150?text=No+Image" alt="{{ menu.nama_menu }}" class="menu-image">
+                            {% endif %}
+                            
+                            <div class="menu-details">
+                                <div class="menu-name">{{ menu.nama_menu }}</div>
+                                <div class="menu-description">{{ menu.keterangan_makanan }}</div>
+                            </div>
+                            
+                            <div class="menu-price">
+                                <div class="price-value">Rp {{ menu.harga_makanan }}</div>
+                                <button class="btn btn-add-cart" data-menu-id="{{ menu.id }}" data-menu-name="{{ menu.nama_menu }}" data-menu-price="{{ menu.harga_makanan }}">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        No menu items available at the moment.
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="cart-container" id="cartContainer">
+                <div class="cart-title">Your Order</div>
+                
+                <div id="cartItems">
+                    <div class="cart-empty">Your cart is empty</div>
+                </div>
+                
+                <div class="cart-subtotal" style="display: none;" id="cartSubtotal">
+                    <div>Subtotal:</div>
+                    <div>Rp <span id="subtotalValue">0</span></div>
+                </div>
+                
+                <div class="cart-actions">
+                    <button class="btn btn-primary btn-checkout" id="checkoutBtn" disabled>
+                        Process Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <a href="#" class="mobile-cart-btn" id="mobileCartBtn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="mobile-cart-badge" id="cartBadge">0</span>
+    </a>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItems = document.getElementById('cartItems');
+            const cartSubtotal = document.getElementById('cartSubtotal');
+            const subtotalValue = document.getElementById('subtotalValue');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const mobileCartBtn = document.getElementById('mobileCartBtn');
+            const cartBadge = document.getElementById('cartBadge');
+            const cartContainer = document.getElementById('cartContainer');
+            
+            let cart = [];
+            let subtotal = 0;
+            
+            // Add to cart buttons
+            document.querySelectorAll('.btn-add-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    {% if user.is_authenticated and user.role == 'buyer' %}
+                        const menuId = this.getAttribute('data-menu-id');
+                        const menuName = this.getAttribute('data-menu-name');
+                        const menuPrice = parseInt(this.getAttribute('data-menu-price'));
+                        
+                        // Check if item already in cart
+                        const existingItem = cart.find(item => item.id === menuId);
+                        
+                        if (existingItem) {
+                            existingItem.quantity += 1;
+                        } else {
+                            cart.push({
+                                id: menuId,
+                                name: menuName,
+                                price: menuPrice,
+                                quantity: 1
+                            });
+                        }
+                        
+                        updateCart();
+                        
+                        // Send AJAX request to add to cart
+                        fetch('{% url "add_to_cart" "00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', menuId), {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                            // Store order ID for checkout
+                            if (data.order_id) {
+                                localStorage.setItem('current_order_id', data.order_id);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    {% else %}
+                        window.location.href = '{% url "login" %}?next={{ request.path }}';
+                    {% endif %}
+                });
+            });
+            
+            // Mobile cart button
+            mobileCartBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                cartContainer.style.display = cartContainer.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // Update cart display
+            function updateCart() {
+                if (cart.length === 0) {
+                    cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+                    cartSubtotal.style.display = 'none';
+                    checkoutBtn.disabled = true;
+                } else {
+                    let cartHTML = '';
+                    subtotal = 0;
+                    
+                    cart.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        subtotal += itemTotal;
+                        
+                        cartHTML += `
+                            <div class="cart-item" data-id="${item.id}">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-quantity">
+                                    <button class="cart-quantity-btn decrease-btn" data-id="${item.id}">-</button>
+                                    <span class="cart-quantity-value">${item.quantity}</span>
+                                    <button class="cart-quantity-btn increase-btn" data-id="${item.id}">+</button>
+                                </div>
+                                <div class="cart-item-price">Rp ${itemTotal}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    cartItems.innerHTML = cartHTML;
+                    subtotalValue.textContent = subtotal;
+                    cartSubtotal.style.display = 'flex';
+                    checkoutBtn.disabled = false;
+                    
+                    // Add event listeners for quantity buttons
+                    document.querySelectorAll('.decrease-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            const item = cart.find(item => item.id === id);
+                            
+                            if (item.quantity > 1) {
+                                item.quantity -= 1;
+                            } else {
+                                cart = cart.filter(item => item.id !== id);
+                            }
+                            
+                            updateCart();
+                        });
+                    });
+                    
+                    document.querySelectorAll('.increase-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            const item = cart.find(item => item.id === id);
+                            item.quantity += 1;
+                            updateCart();
+                        });
+                    });
+                }
+                
+                // Update cart badge
+                cartBadge.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+            }
+            
+            // Checkout button
+            checkoutBtn.addEventListener('click', function() {
+                {% if user.is_authenticated and user.role == 'buyer' %}
+                    // Get order ID from localStorage
+                    const orderId = localStorage.getItem('current_order_id');
+                    if (orderId) {
+                        // Redirect to checkout page with order ID
+                        window.location.href = '{% url "checkout" "00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', orderId);
+                    } else {
+                        // Redirect to view cart page if no order ID
+                        window.location.href = '{% url "view_cart" restoran.id %}';
+                    }
+                {% else %}
+                    window.location.href = '{% url "login" %}?next={{ request.path }}';
+                {% endif %}
+            });
+        });
+    </script>
+</body>
+</html> 

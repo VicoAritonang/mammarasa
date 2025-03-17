@@ -1,0 +1,13 @@
+django
+gunicorn
+whitenoise
+requests
+urllib3
+psycopg2-binary
+dj-database-url
+django-cors-headers
+djangorestframework
+Pillow
+social-auth-app-django
+django-otp
+qrcode

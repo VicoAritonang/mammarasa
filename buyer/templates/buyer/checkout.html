@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Mamma Rasa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .navbar {
+            background-color: #ff6b6b;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            color: #fff;
+        }
+        .navbar-nav .nav-link {
+            color: #fff;
+        }
+        .page-header {
+            background-color: #fff;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .page-title {
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        .checkout-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .restaurant-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .restaurant-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .restaurant-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .order-items {
+            margin-bottom: 30px;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .order-item-details {
+            flex: 1;
+        }
+        .order-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .order-item-price {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .order-item-quantity {
+            margin-left: 20px;
+            color: #666;
+        }
+        .order-item-total {
+            font-weight: 600;
+            color: #ff6b6b;
+            width: 100px;
+            text-align: right;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
+            border-color: #ff6b6b;
+        }
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .payment-method {
+            flex: 1;
+            min-width: 120px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-method:hover {
+            border-color: #ff6b6b;
+        }
+        .payment-method.active {
+            border-color: #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+        .payment-method i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        .payment-method.active i {
+            color: #ff6b6b;
+        }
+        .payment-method-name {
+            font-weight: 600;
+        }
+        .order-summary {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .summary-total-value {
+            color: #ff6b6b;
+        }
+        .place-order-btn {
+            background-color: #ff6b6b;
+            border-color: #ff6b6b;
+            width: 100%;
+            padding: 12px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .place-order-btn:hover {
+            background-color: #ff5252;
+            border-color: #ff5252;
+        }
+        .back-to-cart {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Mamma Rasa</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'buyer_page' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'order_history' %}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">Checkout</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <form method="post" action="{% url 'checkout' order.id %}">
+                    {% csrf_token %}
+                    <div class="checkout-container">
+                        <h3 class="section-title">Order Details</h3>
+                        
+                        <div class="restaurant-info">
+                            {% if order.restoran.foto_restoran %}
+                                <img src="{{ order.restoran.foto_restoran.url }}" alt="{{ order.restoran.nama_restoran }}" class="restaurant-image">
+                            {% else %}
+                                <img src="https://via.placeholder.com/60?text=R" alt="{{ order.restoran.nama_restoran }}" class="restaurant-image">
+                            {% endif %}
+                            <div>
+                                <div class="restaurant-name">{{ order.restoran.nama_restoran }}</div>
+                                <div>{{ order.restoran.pemilik_restoran.email }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-items">
+                            {% for item in order_items %}
+                                <div class="order-item">
+                                    {% if item.menu.foto_makanan %}
+                                        <img src="{{ item.menu.foto_makanan.url }}" alt="{{ item.menu.nama_menu }}" class="order-item-image">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/60?text=Food" alt="{{ item.menu.nama_menu }}" class="order-item-image">
+                                    {% endif %}
+                                    
+                                    <div class="order-item-details">
+                                        <div class="order-item-name">{{ item.menu.nama_menu }}</div>
+                                        <div class="order-item-price">Rp {{ item.menu.harga_makanan }}</div>
+                                    </div>
+                                    
+                                    <div class="order-item-quantity">
+                                        x{{ item.quantity }}
+                                    </div>
+                                    
+                                    <div class="order-item-total">
+                                        Rp {{ item.total_price }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-container">
+                        <h3 class="section-title">Delivery Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ user.username }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone_number }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="form-label">Delivery Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required>{{ user.address }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes" class="form-label">Order Notes (Optional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Any special instructions for your order?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-container">
+                        <h3 class="section-title">Payment Method</h3>
+                        
+                        <div class="payment-methods">
+                            <div class="payment-method active" data-method="cash">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <div class="payment-method-name">Cash</div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="transfer">
+                                <i class="fas fa-university"></i>
+                                <div class="payment-method-name">Bank Transfer</div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="ewallet">
+                                <i class="fas fa-wallet"></i>
+                                <div class="payment-method-name">E-Wallet</div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="payment_method" id="payment_method" value="cash">
+                    </div>
+                
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h3 class="summary-title">Order Summary</h3>
+                    
+                    <div class="summary-item">
+                        <div>Subtotal</div>
+                        <div>Rp {{ order.subtotal }}</div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <div>Service Fee</div>
+                        <div>Rp {{ order.service_fee }}</div>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <div>Total</div>
+                        <div class="summary-total-value">Rp {{ order.total_price }}</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary place-order-btn">
+                        <i class="fas fa-wallet me-2"></i> Bayar Sekarang
+                    </button>
+                </form>
+                
+                <a href="{% url 'view_cart' order.restoran.id %}" class="back-to-cart">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const paymentMethodInput = document.getElementById('payment_method');
+            
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Remove active class from all methods
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+                    
+                    // Add active class to clicked method
+                    this.classList.add('active');
+                    
+                    // Update hidden input value
+                    paymentMethodInput.value = this.getAttribute('data-method');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
