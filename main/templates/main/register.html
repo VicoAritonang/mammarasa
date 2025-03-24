@@ -56,9 +56,15 @@
             <label for="id_password1">Password:</label>
             {{ form.password1 }}
             {% if form.password1.errors %}
-                <div class="text-danger">
-                    {{ form.password1.errors }}
-                </div>
+                <ul class="text-danger mt-2 mb-0" style="list-style-type: disc; padding-left: 20px;">
+                    {% for error in form.password1.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="form-text text-muted">
+                    Password must be at least 8 characters, include uppercase, lowercase, number, and symbol.
+                </small>
             {% endif %}
         </div>
         
@@ -71,11 +77,75 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- CAPTCHA -->
+        <div class="form-group">
+            <label for="id_captcha">Captcha:</label>
+            
+            <!-- Membungkus canvas dan tombol refresh dalam div dengan Flexbox -->
+            <div class="captcha-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <canvas id="captchaCanvasRegister" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+                
+                <!-- Tombol refresh di sebelah kanan canvas -->
+                <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Register')" style="margin-left: 10px;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
+            <input type="text" id="captchaInputRegister" class="form-control" placeholder="Enter captcha text">
+            
+            <div id="captchaErrorRegister" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
+        </div>        
         
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">Register</button>
         </div>
     </form>
+
+    <!-- CAPTCHA SCRIPT -->
+    <script>
+        let generatedCaptchaRegister = '';
+    
+        function generateCaptcha() {
+            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            const ctx = document.getElementById("captchaCanvasRegister").getContext('2d');
+            ctx.clearRect(0, 0, 200, 50);
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "#000";
+
+            for (let i = 0; i < captcha.length; i++) {
+                const letter = captcha.charAt(i);
+                const x = 20 + i * 25;
+                const y = 30 + Math.sin(i * 0.8) * 5;  // efek bergelombang
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(Math.random() * 0.4 - 0.2); // sedikit rotasi
+                ctx.fillText(letter, 0, 0);
+                ctx.restore();
+            }
+
+            generatedCaptchaRegister = captcha;
+        }
+    
+        window.onload = function () {
+            generateCaptcha();
+        };
+    
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const userInput = document.getElementById("captchaInputRegister").value.trim();
+            if (userInput !== generatedCaptchaRegister) {
+                e.preventDefault();
+                document.getElementById("captchaErrorRegister").style.display = "block";
+                generateCaptcha();
+                return false;
+            }
+        });
+    </script>
     
     <div class="divider">
         <span>OR</span>
@@ -97,4 +167,4 @@
         <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

@@ -1,7 +1,28 @@
+import re
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from .models import User
+
+
+def validate_strong_password(password):
+    """Validates password strength based on several rules and returns multiple error messages"""
+    errors = []
+
+    if len(password) < 8:
+        errors.append('Password must be at least 8 characters long.')
+    if not re.search(r'[A-Z]', password):
+        errors.append('Password must contain at least one uppercase letter.')
+    if not re.search(r'[a-z]', password):
+        errors.append('Password must contain at least one lowercase letter.')
+    if not re.search(r'\d', password):
+        errors.append('Password must contain at least one digit number.')
+    if not re.search(r'[^\w\s]', password):  # Special character
+        errors.append('Password must contain at least one special character (e.g., !, @, #, etc.).')
+
+    if errors:
+        raise ValidationError(errors)
 
 class LoginForm(AuthenticationForm):
     username = forms.EmailField(
@@ -29,7 +50,7 @@ class RegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),
         label='Confirm Password'
     )
-    
+
     class Meta:
         model = User
         fields = ('name', 'email', 'profile_image', 'role')
@@ -39,23 +60,28 @@ class RegistrationForm(forms.ModelForm):
             'profile_image': forms.FileInput(attrs={'class': 'form-control'}),
             'role': forms.Select(attrs={'class': 'form-control'}),
         }
-    
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        validate_strong_password(password1)
+        return password1
+
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
-        
+
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('Passwords do not match')
-        
+
         return password2
-    
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
-        
+
         if commit:
             user.save()
-        
+
         return user
 
 class RoleSelectionForm(forms.ModelForm):
@@ -64,4 +90,4 @@ class RoleSelectionForm(forms.ModelForm):
         fields = ('role',)
         widgets = {
             'role': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        } 
+        }
