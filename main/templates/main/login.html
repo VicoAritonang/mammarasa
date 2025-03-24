@@ -31,11 +31,53 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- pengimplementasian captcha -->
+        <div class="form-group">
+            <label for="id_captcha">Captcha:</label>
+            <canvas id="captchaCanvasLogin" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+            <input type="text" id="captchaInputLogin" class="form-control" placeholder="Enter captcha text">
+            <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Login')">Refresh Captcha</button>
+            <div id="captchaErrorLogin" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
+        </div>
         
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">Login</button>
         </div>
     </form>
+
+    <script>
+        let generatedCaptchaLogin = '';
+    
+        function generateCaptcha(type) {
+            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+    
+            const ctx = document.getElementById("captchaCanvasLogin").getContext('2d');
+            ctx.clearRect(0, 0, 200, 50);
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText(captcha, 10, 35);
+            generatedCaptchaLogin = captcha;
+        }
+    
+        window.onload = function () {
+            generateCaptcha('Login');
+        };
+    
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const userInput = document.getElementById("captchaInputLogin").value.trim();
+            if (userInput !== generatedCaptchaLogin) {
+                e.preventDefault();
+                document.getElementById("captchaErrorLogin").style.display = "block";
+                generateCaptcha('Login');
+                return false;
+            }
+        });
+    </script>
     
     <div class="divider">
         <span>OR</span>

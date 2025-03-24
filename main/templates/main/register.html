@@ -78,11 +78,53 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- pengimplentasian capctah -->
+        <div class="form-group">
+            <label for="id_captcha">Captcha:</label>
+            <canvas id="captchaCanvasRegister" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+            <input type="text" id="captchaInputRegister" class="form-control" placeholder="Enter captcha text">
+            <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Register')">Refresh Captcha</button>
+            <div id="captchaErrorRegister" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
+        </div>        
         
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">Register</button>
         </div>
     </form>
+
+    <script>
+        let generatedCaptchaRegister = '';
+    
+        function generateCaptcha(type) {
+            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+    
+            const ctx = document.getElementById("captchaCanvasRegister").getContext('2d');
+            ctx.clearRect(0, 0, 200, 50);
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText(captcha, 10, 35);
+            generatedCaptchaRegister = captcha;
+        }
+    
+        window.onload = function () {
+            generateCaptcha('Register');
+        };
+    
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const userInput = document.getElementById("captchaInputRegister").value.trim();
+            if (userInput !== generatedCaptchaRegister) {
+                e.preventDefault();
+                document.getElementById("captchaErrorRegister").style.display = "block";
+                generateCaptcha('Register');
+                return false;
+            }
+        });
+    </script>
     
     <div class="divider">
         <span>OR</span>
