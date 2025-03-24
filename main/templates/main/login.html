@@ -35,9 +35,18 @@
         <!-- pengimplementasian captcha -->
         <div class="form-group">
             <label for="id_captcha">Captcha:</label>
-            <canvas id="captchaCanvasLogin" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+            
+            <!-- Membungkus canvas dan tombol refresh dalam div dengan Flexbox -->
+            <div class="captcha-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <canvas id="captchaCanvasLogin" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+                
+                <!-- Tombol refresh di sebelah kanan canvas -->
+                <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Login')" style="margin-left: 10px;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
             <input type="text" id="captchaInputLogin" class="form-control" placeholder="Enter captcha text">
-            <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Login')">Refresh Captcha</button>
             <div id="captchaErrorLogin" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
         </div>
         
@@ -99,4 +108,4 @@
         <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

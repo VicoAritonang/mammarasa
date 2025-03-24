@@ -55,7 +55,6 @@
         <div class="form-group">
             <label for="id_password1">Password:</label>
             {{ form.password1 }}
-
             {% if form.password1.errors %}
                 <ul class="text-danger mt-2 mb-0" style="list-style-type: disc; padding-left: 20px;">
                     {% for error in form.password1.errors %}
@@ -79,12 +78,22 @@
             {% endif %}
         </div>
 
-        <!-- pengimplentasian capctah -->
+        <!-- CAPTCHA -->
         <div class="form-group">
             <label for="id_captcha">Captcha:</label>
-            <canvas id="captchaCanvasRegister" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+            
+            <!-- Membungkus canvas dan tombol refresh dalam div dengan Flexbox -->
+            <div class="captcha-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <canvas id="captchaCanvasRegister" width="200" height="50" style="border:1px solid #ccc; margin-bottom: 8px;"></canvas>
+                
+                <!-- Tombol refresh di sebelah kanan canvas -->
+                <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Register')" style="margin-left: 10px;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
             <input type="text" id="captchaInputRegister" class="form-control" placeholder="Enter captcha text">
-            <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="generateCaptcha('Register')">Refresh Captcha</button>
+            
             <div id="captchaErrorRegister" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
         </div>        
         
@@ -93,26 +102,38 @@
         </div>
     </form>
 
+    <!-- CAPTCHA SCRIPT -->
     <script>
         let generatedCaptchaRegister = '';
     
-        function generateCaptcha(type) {
+        function generateCaptcha() {
             let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let captcha = '';
             for (let i = 0; i < 6; i++) {
                 captcha += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-    
+
             const ctx = document.getElementById("captchaCanvasRegister").getContext('2d');
             ctx.clearRect(0, 0, 200, 50);
             ctx.font = "30px Arial";
             ctx.fillStyle = "#000";
-            ctx.fillText(captcha, 10, 35);
+
+            for (let i = 0; i < captcha.length; i++) {
+                const letter = captcha.charAt(i);
+                const x = 20 + i * 25;
+                const y = 30 + Math.sin(i * 0.8) * 5;  // efek bergelombang
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(Math.random() * 0.4 - 0.2); // sedikit rotasi
+                ctx.fillText(letter, 0, 0);
+                ctx.restore();
+            }
+
             generatedCaptchaRegister = captcha;
         }
     
         window.onload = function () {
-            generateCaptcha('Register');
+            generateCaptcha();
         };
     
         document.querySelector("form").addEventListener("submit", function (e) {
@@ -120,7 +141,7 @@
             if (userInput !== generatedCaptchaRegister) {
                 e.preventDefault();
                 document.getElementById("captchaErrorRegister").style.display = "block";
-                generateCaptcha('Register');
+                generateCaptcha();
                 return false;
             }
         });
