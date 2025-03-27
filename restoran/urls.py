@@ -10,6 +10,6 @@ urlpatterns = [
     path('toggle-menu-visibility/<uuid:menu_id>/', views.toggle_menu_visibility, name='toggle_menu_visibility'),
     path('generate-qr/', views.generate_qr, name='generate_qr'),
     path('view-orders/', views.view_orders, name='view_orders'),
-    path('menu/<uuid:restoran_id>/', views.menu_view, name='menu_view'),
+    path('menu/<str:restoran_id>/', views.menu_view, name='menu_view'),
     path('add-to-cart/<uuid:menu_id>/', views.add_to_cart, name='add_to_cart'),
 ] 

@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from .models import User
+from .utils import sanitize_html
 
 
 def validate_strong_password(password):
@@ -33,6 +34,10 @@ class LoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
         label='Password'
     )
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        return sanitize_html(username)
 
 class OTPVerificationForm(forms.Form):
     otp = forms.CharField(
@@ -40,6 +45,10 @@ class OTPVerificationForm(forms.Form):
         label='OTP',
         max_length=6
     )
+    
+    def clean_otp(self):
+        otp = self.cleaned_data.get('otp')
+        return sanitize_html(otp)
 
 class RegistrationForm(forms.ModelForm):
     password1 = forms.CharField(
@@ -74,6 +83,14 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError('Passwords do not match')
 
         return password2
+        
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        return sanitize_html(name)
+        
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        return sanitize_html(email)
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -91,3 +108,7 @@ class RoleSelectionForm(forms.ModelForm):
         widgets = {
             'role': forms.RadioSelect(attrs={'class': 'form-check-input'}),
         }
+        
+    def clean_role(self):
+        role = self.cleaned_data.get('role')
+        return sanitize_html(role)

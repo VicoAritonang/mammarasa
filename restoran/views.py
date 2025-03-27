@@ -11,6 +11,7 @@ from PIL import Image
 from django.core.files.base import ContentFile
 import requests
 import uuid
+from main.utils import sanitize_html, caesar_encrypt, caesar_decrypt
 
 from main.models import User
 from .models import Restoran, Menu
@@ -164,8 +165,11 @@ def generate_qr(request):
     
     restoran = get_object_or_404(Restoran, user=request.user)
     
-    # Generate menu URL
-    menu_url = request.build_absolute_uri(reverse('menu_view', args=[str(restoran.id)]))
+    # Encrypt restaurant ID using Caesar cipher
+    encrypted_id = caesar_encrypt(restoran.id)
+    
+    # Generate menu URL with encrypted ID
+    menu_url = request.build_absolute_uri(reverse('menu_view', args=[encrypted_id]))
     
     # Generate QR code using external API
     try:
@@ -192,20 +196,27 @@ def generate_qr(request):
 
 def menu_view(request, restoran_id):
     """Public view for restaurant menu page (accessible via QR code)"""
-    restoran = get_object_or_404(Restoran, id=restoran_id)
-    menus = Menu.objects.filter(restoran=restoran, is_visible=True)
-    
-    # If user is authenticated and is a buyer, add this restaurant to visited restaurants
-    if request.user.is_authenticated and request.user.role == 'buyer':
-        buyer, created = Buyer.objects.get_or_create(user=request.user)
-        buyer.visited_restaurants.add(restoran)
-    
-    context = {
-        'restoran': restoran,
-        'menus': menus,
-    }
-    
-    return render(request, 'restoran/main_view.html', context)
+    try:
+        # Decrypt restaurant ID from the URL
+        decrypted_id = caesar_decrypt(restoran_id)
+        restoran = get_object_or_404(Restoran, id=decrypted_id)
+        menus = Menu.objects.filter(restoran=restoran, is_visible=True)
+        
+        # If user is authenticated and is a buyer, add this restaurant to visited restaurants
+        if request.user.is_authenticated and request.user.role == 'buyer':
+            buyer, created = Buyer.objects.get_or_create(user=request.user)
+            buyer.visited_restaurants.add(restoran)
+        
+        context = {
+            'restoran': restoran,
+            'menus': menus,
+        }
+        
+        return render(request, 'restoran/main_view.html', context)
+    except Exception as e:
+        # In case of decryption failure or invalid URL
+        messages.error(request, 'Invalid restaurant link')
+        return redirect('home')
 
 @login_required
 def add_to_cart(request, menu_id):

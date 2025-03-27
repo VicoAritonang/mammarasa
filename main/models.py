@@ -5,6 +5,7 @@ from django.utils import timezone
 from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
 from datetime import timedelta
+from .utils import encrypt_data, decrypt_data
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, **extra_fields):
@@ -13,6 +14,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, name=name, **extra_fields)
         if password:
+            # Password will be hashed by Django's set_password method
             user.set_password(password)
         user.save(using=self._db)
         return user
@@ -48,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class OTP(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    otp = models.CharField(max_length=6)
+    otp = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -57,6 +59,12 @@ class OTP(models.Model):
     def is_valid(self):
         # OTP valid for 10 minutes
         return (timezone.now() - self.created_at).total_seconds() < 600
+        
+    def save(self, *args, **kwargs):
+        # Encrypt OTP before saving
+        if not self.id:  # Only encrypt when first created
+            self.otp = encrypt_data(self.otp)
+        super().save(*args, **kwargs)
 
 class LoginAttempt(models.Model):
     user_email = models.EmailField()

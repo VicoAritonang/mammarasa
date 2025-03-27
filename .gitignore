@@ -1,0 +1,81 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Virtual Environment
+env/
+venv/
+ENV/
+.env
+
+# Python #
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Visual Studio Code #
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# PyCharm #
+.idea/
+*.iml
+*.iws
+*.iws
+*.ipr
+.idea_modules/
+
+# PostgreSQL #
+*.log
+*.sql
+*.sqlite3
+*.dump
+
+# Certificate files #
+*.pem
+*.key
+*.crt
+*.cert
+ssl_certs/
+
+# Environment specific files #
+.env.local
+.env.development
+.env.test
+.env.production
+
+# OS specific files #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 
