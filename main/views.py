@@ -6,10 +6,12 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.utils import timezone
 
 from .forms import LoginForm, RegistrationForm, OTPVerificationForm, RoleSelectionForm
-from .models import User, OTP
+from .models import User, OTP, LoginAttempt
 from .utils import create_and_send_otp, verify_otp
+from datetime import timedelta
 
 def login_view(request):
     """View for user login with email/password or Google OAuth"""
@@ -22,35 +24,84 @@ def login_view(request):
         else:
             return redirect('role_selection')
     
-    # Store next parameter in session if it exists
-    next_url = request.GET.get('next')
-    if next_url:
-        request.session['next_url'] = next_url
+    # Get client IP address
+    ip_address = request.META.get('REMOTE_ADDR')
     
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=email, password=password)
-            
-            if user is not None:
-                # Create and send OTP for verification
-                otp, email_sent = create_and_send_otp(user)
+        email = form.data.get('username')  # email field is named username in the form
+        ip_address = request.META.get('REMOTE_ADDR')
+        
+        # Only validate form first
+        if not form.is_valid():
+            # Create failed attempt record immediately
+            if email:  # Check if email was provided
+                LoginAttempt.objects.create(
+                    user_email=email,
+                    successful=False,
+                    ip_address=ip_address
+                )
                 
+                # Check if this attempt triggered the timeout
+                timeout_remaining = LoginAttempt.get_timeout_remaining(ip_address)
+                
+                if timeout_remaining > 0:
+                    return HttpResponseRedirect(reverse('login'))
+                else:
+                    messages.error(request, 'Invalid email or password.')
+                return HttpResponseRedirect(reverse('login'))
+
+        
+        if form.is_valid():
+            user = form.get_user()
+            
+            # Check if user is trying to access the correct role
+            if 'next' in request.GET:
+                intended_url = request.GET['next']
+                if ('buyer' in intended_url and user.role == 'restoran') or \
+                   ('restoran' in intended_url and user.role == 'buyer'):
+                    messages.error(request, "You don't have permission to access that page.")
+                    LoginAttempt.objects.create(
+                        user_email=email,
+                        successful=False,
+                        ip_address=ip_address
+                    )
+                    return HttpResponseRedirect(reverse('login'))
+            
+            # Create successful login attempt record
+            LoginAttempt.objects.create(
+                user_email=email,
+                successful=True,
+                ip_address=ip_address
+            )
+            
+            # Continue with existing login logic
+            if user is not None:
+                otp, email_sent = create_and_send_otp(user)
                 if not email_sent:
                     messages.error(request, 'Failed to send OTP email. Please try again or contact support.')
-                    return render(request, 'main/login.html', {'form': form})
-                
-                # Store user ID in session for OTP verification
+                    return HttpResponseRedirect(reverse('login'))
                 request.session['user_id_for_otp'] = str(user.id)
                 return redirect('verify_otp')
-            else:
+        else:
+            # Only create failed attempt if form was actually submitted (not just a refresh)
+            if email:  # Check if email was provided
+                LoginAttempt.objects.create(
+                    user_email=email,
+                    successful=False,
+                    ip_address=ip_address
+                )
                 messages.error(request, 'Invalid email or password.')
+                return HttpResponseRedirect(reverse('login'))
     else:
         form = LoginForm()
+        # Calculate timeout remaining from database using IP address
+        timeout_remaining = LoginAttempt.get_timeout_remaining(ip_address)
     
-    return render(request, 'main/login.html', {'form': form})
+    return HttpResponseRedirect(reverse('login')) if request.method == 'POST' else render(request, 'main/login.html', {
+        'form': form,
+        'timeout_remaining': timeout_remaining
+    })
 
 def register_view(request):
     """View for user registration"""

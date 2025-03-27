@@ -9,6 +9,35 @@
         <p>Welcome back! Please login to your account.</p>
     </div>
     
+    {% if timeout_remaining > 0 %}
+    <div class="alert alert-warning text-center" style="margin: 2rem auto;">
+        <p class="mb-0">Please wait <span id="timeoutCounter" class="fw-bold"></span> before trying again.</p>
+    </div>
+
+    <script>
+        let timeoutRemaining = parseInt("{{ timeout_remaining }}");
+        let timeoutInterval;
+
+        function updateTimeoutDisplay() {
+            const timeoutCounter = document.getElementById('timeoutCounter');
+
+            if (timeoutRemaining > 0) {
+                const minutes = Math.floor(timeoutRemaining / 60);
+                const seconds = timeoutRemaining % 60;
+                timeoutCounter.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                timeoutRemaining--;
+            } else {
+                if (timeoutInterval) {
+                    clearInterval(timeoutInterval);
+                }
+                window.location.reload();
+            }
+        }
+
+        timeoutInterval = setInterval(updateTimeoutDisplay, 1000);
+        updateTimeoutDisplay();
+    </script>
+    {% else %}
     <form method="post">
         {% csrf_token %}
         
@@ -49,9 +78,9 @@
             <input type="text" id="captchaInputLogin" class="form-control" placeholder="Enter captcha text">
             <div id="captchaErrorLogin" class="text-danger mt-1" style="display:none;">Captcha is incorrect.</div>
         </div>
-        
+
         <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary" id="loginButton">Login</button>
         </div>
     </form>
 
@@ -107,5 +136,6 @@
     <div class="auth-footer">
         <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
