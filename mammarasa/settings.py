@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
     'social_django',
+    'auditlog',
+    'timedelta',
 ]
 
 MIDDLEWARE = [

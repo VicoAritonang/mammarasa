@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
 from django.utils import timezone
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+from datetime import timedelta
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, **extra_fields):
@@ -54,3 +57,38 @@ class OTP(models.Model):
     def is_valid(self):
         # OTP valid for 10 minutes
         return (timezone.now() - self.created_at).total_seconds() < 600
+
+class LoginAttempt(models.Model):
+    user_email = models.EmailField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    successful = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user_email} - {self.timestamp}"
+    
+    @classmethod
+    def get_timeout_remaining(cls, ip_address):
+        recent_attempts = cls.objects.filter(
+            ip_address=ip_address,
+            timestamp__gte=timezone.now() - timedelta(minutes=5),
+            successful=False
+        ).order_by('-timestamp')[:3]
+        
+        # Check if there are exactly 3 recent failed attempts
+        if len(recent_attempts) == 3:
+            # Get the most recent failed attempt
+            last_attempt = recent_attempts[0]
+            
+            if last_attempt:
+                timeout_end = last_attempt.timestamp + timedelta(minutes=2)
+                remaining = (timeout_end - timezone.now()).total_seconds()
+                return max(0, int(remaining))
+        return 0
+
+# Register models with auditlog
+auditlog.register(User)
+auditlog.register(LoginAttempt)
