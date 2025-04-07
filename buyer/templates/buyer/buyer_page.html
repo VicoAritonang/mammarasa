@@ -81,13 +81,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Dashboard</a>
+                        <a class="nav-link active" href="{% url 'buyer_page' %}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Orders</a>
+                        <a class="nav-link" href="{% url 'order_history' %}">Orders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Restaurants</a>
+                        <a class="nav-link" href="{% url 'restoran_page' %}">Restaurants</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
