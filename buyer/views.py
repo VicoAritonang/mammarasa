@@ -146,23 +146,35 @@ def checkout(request, order_id):
     order_items = order.items.all()
 
     if request.method == 'POST':
-        form = OrderReviewForm(request.POST, instance=order)
-        if form.is_valid():
-            # Simpan informasi delivery di sini!
-            form.save()  # Menyimpan data name, phone, address ke Order
-            return redirect('payment', order_id=order.id)
-        else:
-            messages.error(request, "Mohon lengkapi data pengiriman dengan benar.")
-    else:
-        form = OrderReviewForm(instance=order)
+        # Ambil data dari form HTML (input manual, bukan ModelForm)
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        notes = request.POST.get('notes')
+        payment_method = request.POST.get('payment_method')
+
+        if not name or not phone or not address:
+            messages.error(request, "Semua kolom wajib diisi.")
+            return redirect('checkout', order_id=order.id)
+
+        # Simpan data ke Order
+        order.name = name
+        order.phone = phone
+        order.address = address
+        order.notes = notes
+        order.payment_method = payment_method
+        order.save()
+
+        return redirect('payment', order_id=order.id)
 
     context = {
         'order': order,
         'order_items': order_items,
-        'form': form,
+        'user': request.user,
     }
 
     return render(request, 'buyer/checkout.html', context)
+
 
 
 @login_required

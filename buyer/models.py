@@ -25,6 +25,16 @@ class Order(models.Model):
     status = models.BooleanField(choices=STATUS_CHOICES, default=False)
     review = models.TextField(blank=True, null=True)
     order_date = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    payment_method = models.CharField(max_length=20, choices=[
+        ('cash', 'Cash'),
+        ('transfer', 'Transfer'),
+        ('ewallet', 'E-Wallet'),
+    ], default='cash')
+
     
     def __str__(self):
         return f"Order {self.id} - {self.buyer.user.name} at {self.restoran.nama_restoran}"
