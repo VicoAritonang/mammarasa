@@ -139,42 +139,31 @@ def update_cart_item(request, item_id):
 
 @login_required
 def checkout(request, order_id):
-    """View for checkout and payment"""
     if request.user.role != 'buyer':
         return redirect('home')
-    
-    try:
-        order = get_object_or_404(Order, id=order_id, buyer__user=request.user, status=False)
-    except:
-        # If order not found, check if there's an order ID in the session
-        session_order_id = request.session.get('current_order_id')
-        if session_order_id:
-            try:
-                order = Order.objects.get(id=session_order_id, buyer__user=request.user, status=False)
-            except Order.DoesNotExist:
-                messages.error(request, "Order not found. Your cart may be empty.")
-                return redirect('buyer_page')
-        else:
-            messages.error(request, "Order not found. Your cart may be empty.")
-            return redirect('buyer_page')
-    
+
+    order = get_object_or_404(Order, id=order_id, buyer__user=request.user, status=False)
     order_items = order.items.all()
-    
+
     if request.method == 'POST':
         form = OrderReviewForm(request.POST, instance=order)
         if form.is_valid():
-            # Redirect to payment page instead of processing the order directly
+            # Simpan informasi delivery di sini!
+            form.save()  # Menyimpan data name, phone, address ke Order
             return redirect('payment', order_id=order.id)
+        else:
+            messages.error(request, "Mohon lengkapi data pengiriman dengan benar.")
     else:
         form = OrderReviewForm(instance=order)
-    
+
     context = {
         'order': order,
         'order_items': order_items,
         'form': form,
     }
-    
+
     return render(request, 'buyer/checkout.html', context)
+
 
 @login_required
 def payment(request, order_id):
