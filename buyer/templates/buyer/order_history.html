@@ -1,277 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order History - Mamma Rasa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .navbar {
-            background-color: #ff6b6b;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .navbar-brand {
-            font-weight: 600;
-            color: #fff;
-        }
-        .navbar-nav .nav-link {
-            color: #fff;
-        }
-        .page-header {
-            background-color: #fff;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .page-title {
-            color: #ff6b6b;
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-        .orders-container {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .order-card {
-            border: 1px solid #eee;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .order-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .order-id {
-            font-weight: 600;
-            color: #666;
-        }
-        .order-date {
-            color: #666;
-        }
-        .order-status {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .status-pending {
-            background-color: #ffeeba;
-            color: #856404;
-        }
-        .status-processing {
-            background-color: #b8daff;
-            color: #004085;
-        }
-        .status-completed {
-            background-color: #c3e6cb;
-            color: #155724;
-        }
-        .status-cancelled {
-            background-color: #f5c6cb;
-            color: #721c24;
-        }
-        .restaurant-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .restaurant-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-        .restaurant-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-        }
-        .order-items {
-            margin-bottom: 15px;
-        }
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .item-name {
-            flex: 1;
-        }
-        .item-quantity {
-            margin: 0 15px;
-            color: #666;
-        }
-        .order-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .order-total-value {
-            color: #ff6b6b;
-        }
-        .order-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-        .btn-view-details {
-            background-color: #ff6b6b;
-            border-color: #ff6b6b;
-        }
-        .btn-view-details:hover {
-            background-color: #ff5252;
-            border-color: #ff5252;
-        }
-        .empty-orders {
-            text-align: center;
-            padding: 50px 0;
-        }
-        .empty-orders i {
-            font-size: 4rem;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
-        .empty-orders h3 {
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .empty-orders p {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .btn-browse {
-            background-color: #ff6b6b;
-            border-color: #ff6b6b;
-            padding: 10px 25px;
-        }
-        .btn-browse:hover {
-            background-color: #ff5252;
-            border-color: #ff5252;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="#">Mamma Rasa</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'buyer_page' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'order_history' %}">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="page-header">
-        <div class="container">
-            <h1 class="page-title">Order History</h1>
-        </div>
-    </div>
-    
-    <div class="container">
-        <div class="orders-container">
-            <h3 class="section-title">Your Orders</h3>
-            
-            {% if orders %}
+{% extends 'main/base.html' %}
+
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+{% include 'main/navbar.html' %}
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Riwayat Pesanan</h1>
+
+        {% if orders %}
+            <div class="grid gap-6">
                 {% for order in orders %}
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div class="order-id">Order #{{ order.id|truncatechars:8 }}</div>
-                            <div class="order-date">{{ order.created_at|date:"F d, Y" }}</div>
-                            <div class="order-status status-{{ order.status|lower }}">{{ order.status }}</div>
-                        </div>
-                        
-                        <div class="restaurant-info">
-                            {% if order.restoran.foto_restoran %}
-                                <img src="{{ order.restoran.foto_restoran.url }}" alt="{{ order.restoran.nama_restoran }}" class="restaurant-image">
-                            {% else %}
-                                <img src="https://via.placeholder.com/50?text=R" alt="{{ order.restoran.nama_restoran }}" class="restaurant-image">
-                            {% endif %}
-                            <div>
-                                <div class="restaurant-name">{{ order.restoran.nama_restoran }}</div>
-                                <div>{{ order.order_items.count }} item{% if order.order_items.count != 1 %}s{% endif %}</div>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold">{{ order.restoran.nama_restoran }}</h3>
+                                    <p class="text-sm text-gray-500">Order ID: {{ order.id|truncatechars:8 }}</p>
+                                    <p class="text-sm text-gray-500">{{ order.created_at|date:"d M Y, H:i" }}</p>
+                                </div>
+                                <span class="inline-flex px-2.5 py-0.5 rounded-full text-sm font-medium
+                                    {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif order.status == 'completed' %}bg-green-100 text-green-800
+                                    {% elif order.status == 'cancelled' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
                             </div>
-                        </div>
-                        
-                        <div class="order-items">
-                            {% for item in order.order_items.all|slice:":3" %}
-                                <div class="order-item">
-                                    <div class="item-name">{{ item.menu.nama_menu }}</div>
-                                    <div class="item-quantity">x{{ item.quantity }}</div>
-                                    <div>Rp {{ item.total_price }}</div>
+
+                            <div class="border-t border-gray-100 pt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Total Items:</span>
+                                    <span class="font-medium">{{ order.items.count }}</span>
                                 </div>
-                            {% endfor %}
-                            
-                            {% if order.order_items.count > 3 %}
-                                <div class="text-center text-muted">
-                                    <small>+ {{ order.order_items.count|add:"-3" }} more item{% if order.order_items.count|add:"-3" != 1 %}s{% endif %}</small>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Total:</span>
+                                    <span class="font-bold text-lg">Rp {{ order.total_price }}</span>
                                 </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="order-total">
-                            <div>Total</div>
-                            <div class="order-total-value">Rp {{ order.total_price }}</div>
-                        </div>
-                        
-                        <div class="order-actions">
-                            <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary btn-view-details">
-                                View Details
-                            </a>
+                            </div>
+
+                            <div class="mt-4 flex justify-end">
+                                <a href="{% url 'order_detail' order.id %}" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                    Lihat Detail
+                                </a>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
-            {% else %}
-                <div class="empty-orders">
-                    <i class="fas fa-receipt"></i>
-                    <h3>No orders yet</h3>
-                    <p>You haven't placed any orders yet. Start ordering from your favorite restaurants!</p>
-                    <a href="{% url 'buyer_page' %}" class="btn btn-primary btn-browse">Browse Restaurants</a>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <div class="mb-4">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
                 </div>
-            {% endif %}
-        </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada pesanan</h3>
+                <p class="text-gray-500">Anda belum memiliki riwayat pesanan.</p>
+                <div class="mt-6">
+                    <a href="{% url 'buyer_page' %}" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        Mulai Pesan
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>
+{% endblock %}
