@@ -77,6 +77,41 @@
                 </div>
             </div>
 
+            <div>
+                <label for="id_captcha" class="block text-gray-700 text-sm font-bold mb-2">Captcha:</label>
+                <div class="flex items-center space-x-4">
+                    <canvas id="captchaCanvasLogin" width="200" height="50" class="border border-gray-300"></canvas>
+                    <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded" onclick="generateCaptcha('Login')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <input type="text" id="captchaInputLogin" class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter captcha text">
+                <div id="captchaErrorLogin" class="text-red-500 text-sm mt-1 hidden">Captcha is incorrect.</div>
+            </div>
+
+            <script>
+                let generatedCaptchaLogin = '';
+            
+                function generateCaptcha(type) {
+                    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    let captcha = '';
+                    for (let i = 0; i < 6; i++) {
+                        captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+            
+                    const ctx = document.getElementById("captchaCanvasLogin").getContext('2d');
+                    ctx.clearRect(0, 0, 200, 50);
+                    ctx.font = "30px Arial";
+                    ctx.fillStyle = "#000";
+                    ctx.fillText(captcha, 10, 35);
+                    generatedCaptchaLogin = captcha;
+                }
+            
+                window.onload = function () {
+                    generateCaptcha('Login');
+                };
+            </script>
+            
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <p class="text-sm text-gray-500">
