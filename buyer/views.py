@@ -139,43 +139,42 @@ def update_cart_item(request, item_id):
 
 @login_required
 def checkout(request, order_id):
+    """View for checkout and payment"""
     if request.user.role != 'buyer':
         return redirect('home')
-
-    order = get_object_or_404(Order, id=order_id, buyer__user=request.user, status=False)
+    
+    try:
+        order = get_object_or_404(Order, id=order_id, buyer__user=request.user, status=False)
+    except:
+        # If order not found, check if there's an order ID in the session
+        session_order_id = request.session.get('current_order_id')
+        if session_order_id:
+            try:
+                order = Order.objects.get(id=session_order_id, buyer__user=request.user, status=False)
+            except Order.DoesNotExist:
+                messages.error(request, "Order not found. Your cart may be empty.")
+                return redirect('buyer_page')
+        else:
+            messages.error(request, "Order not found. Your cart may be empty.")
+            return redirect('buyer_page')
+    
     order_items = order.items.all()
-
+    
     if request.method == 'POST':
-        # Ambil data dari form HTML (input manual, bukan ModelForm)
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
-        notes = request.POST.get('notes')
-        payment_method = request.POST.get('payment_method')
-
-        if not name or not phone or not address:
-            messages.error(request, "Semua kolom wajib diisi.")
-            return redirect('checkout', order_id=order.id)
-
-        # Simpan data ke Order
-        order.name = name
-        order.phone = phone
-        order.address = address
-        order.notes = notes
-        order.payment_method = payment_method
-        order.save()
-
-        return redirect('payment', order_id=order.id)
-
+        form = OrderReviewForm(request.POST, instance=order)
+        if form.is_valid():
+            # Redirect to payment page instead of processing the order directly
+            return redirect('payment', order_id=order.id)
+    else:
+        form = OrderReviewForm(instance=order)
+    
     context = {
         'order': order,
         'order_items': order_items,
-        'user': request.user,
+        'form': form,
     }
-
+    
     return render(request, 'buyer/checkout.html', context)
-
-
 
 @login_required
 def payment(request, order_id):
