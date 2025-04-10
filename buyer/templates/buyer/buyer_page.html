@@ -3,61 +3,76 @@
 {% block title %}My Profile{% endblock %}
 
 {% block content %}
-{% include 'main/navbar.html' %}
-<div class="container mx-auto px-4">
+  {% include 'main/navbar.html' %}
+
+  <!-- Section 1: Hero -->
+  <section class="relative w-full h-screen bg-cover bg-center bg-no-repeat" style="background-image: url('/static/images/bg1.jpg');">
+    <div class="absolute inset-0 bg-black/30 flex flex-col items-center justify-center z-10">
+      <h1 class="text-white text-5xl md:text-7xl font-bold">Welcome</h1>
+      <p class="text-white text-xl mt-4">to Mammarasa</p>
+    </div>
+    <div class="absolute bottom-8 inset-x-0 flex justify-center z-10">
+      <a href="#section2" class="text-white hover:text-gray-200 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 2 -->
+  <section id="section2" class="relative w-full h-screen bg-cover bg-center bg-no-repeat" style="background-image: url('/static/images/bg2.jpg');">
+    <div class="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
+      <h2 class="text-white text-4xl font-semibold">Explore Now!</h2>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section id="section3" class="relative w-full h-screen bg-cover bg-center bg-no-repeat" style="background-image: url('/static/images/bg3.jpg');">
+    <div class="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
+      <h2 class="text-white text-4xl font-semibold">Your Best Food Choice</h2>
+    </div>
+  </section>
+
+  <!-- Section 4: My Profile -->
+  <div class="container mx-auto px-4 py-8 bg-white">
     <div class="text-2xl font-bold my-6">My Profile</div>
     <div class="bg-white rounded-[20px] shadow p-8 mb-10">
-        <div class="flex flex-col md:flex-row gap-8 mb-10 items-center">
+      <div class="flex flex-col md:flex-row gap-8 mb-10 items-center">
+        <div>
+          <img src="/static/images/default-profile.jpeg" alt="{{ user.name|default:'User' }}" class="w-32 h-32 rounded-full object-cover shadow">
+        </div>
+        <div class="flex-1">
+          <h1 class="text-5xl font-bold text-black mb-4">
+            Welcome, <br>{{ user.name|default:"Blair Waldorf" }}!
+          </h1>
+        </div>
+      </div>
+
+      <div class="border border-black rounded-lg p-6">
+        <div class="flex flex-row items-center">
+          <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-                <!-- {% if user.profile_image %}
-                <img src="{{ user.profile_image.url }}" alt="{{ user.name }}" class="w-32 h-32 rounded-full object-cover">
-                {% else %}
-                <img src="/static/images/default-profile.jpg" alt="{{ user.name }}" class="w-32 h-32 rounded-full object-cover">
-                {% endif %} -->
-                <!-- <div class="mt-4">
-                    <button class="flex items-center justify-center border border-gray-300 rounded-full px-6 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                        Edit
-                    </button>
-                </div> -->
+              <h2 class="text-xl font-semibold mb-2">Profile Name</h2>
+              <p class="text-xl">{{ user.name|default:"Blair Waldorf" }}</p>
             </div>
-            <div class="flex-1">
-                <h1 class="text-5xl font-bold text-black mb-4">Welcome,<br>{{ user.name }}!</h1>
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Phone Number</h2>
+              <p class="text-xl">{{ user.phone|default:"-" }}</p>
             </div>
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Role</h2>
+              <div class="inline-block bg-gray-700 text-white px-4 py-1 rounded-full">
+                {{ user.role|default:"User" }}
+              </div>
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Email</h2>
+              <p class="text-xl">{{ user.email|default:"-" }}</p>
+            </div>
+          </div>
         </div>
-        
-        <div class="border border-black rounded-lg p-6">
-            <div class="flex flex-row items-center">
-                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h2 class="text-xl font-semibold mb-2">Profile Name</h2>
-                        <p class="text-xl">{{ user.name|default:"Blair Waldorf" }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold mb-2">Phone Number</h2>
-                        <p class="text-xl">{{ user.phone }}</p>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold mb-2">Role</h2>
-                        <div class="inline-block bg-gray-700 text-white px-4 py-1 rounded-full">
-                            {{ user.role }}
-                        </div>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold mb-2">Email</h2>
-                        <p class="text-xl">{{ user.email }}</p>
-                    </div>
-                </div>
-                <!-- <button class="flex h-[45px] items-center justify-center border border-black rounded-full px-6 py-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                    Edit
-                </button> -->
-            </div>
-        </div>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}
