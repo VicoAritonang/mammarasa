@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from restoran.models import Restoran, Menu
-from buyer.models import Buyer, Order, OrderItem
+from buyer.models import Order, OrderItem
 
 class OrderCreationTest(TestCase):
 
@@ -25,7 +25,7 @@ class OrderCreationTest(TestCase):
         response = self.client.post(url)
 
         # Check that the response is a redirect to the cart view
-        self.assertRedirects(response, reverse('view_cart', args=[self.restoran.id]))
+        self.assertRedirects(response, reverse('view_cart', restoran_id=self.restoran.id))
 
         # Ensure an order has been created
         order = Order.objects.filter(buyer=self.buyer, restoran=self.restoran, status=False).first()
@@ -58,7 +58,7 @@ class OrderCreationTest(TestCase):
         # Check if both items are in the order
         order_items = OrderItem.objects.filter(order=order)
         self.assertEqual(order_items.count(), 2, "There should be two items in the order.")
-    
+
     def test_add_item_to_cart_for_non_buyer(self):
         # Create a non-buyer user (restoran role)
         non_buyer_user = User.objects.create_user(username='testrestoran', password='password', role='restoran')
@@ -70,8 +70,8 @@ class OrderCreationTest(TestCase):
 
         # Ensure that only buyers can add items to the cart
         self.assertEqual(response.status_code, 403, "Non-buyers should not be able to add items to the cart.")
-    
-    def test_order_status_on_creation(self):
+
+    def test_cart_contains_correct_item(self):
         # Login the buyer user
         self.client.login(username='testbuyer', password='password')
 
@@ -79,8 +79,12 @@ class OrderCreationTest(TestCase):
         url = reverse('add_to_cart', args=[self.menu_item.id])
         self.client.post(url)
 
-        # Get the order created
+        # Get the cart (order)
         order = Order.objects.filter(buyer=self.buyer, restoran=self.restoran, status=False).first()
+        self.assertIsNotNone(order)
 
-        # Ensure the order status is 'False' initially
-        self.assertFalse(order.status, "The order status should be False when created.")
+        # Check if the cart contains the correct item
+        order_item = OrderItem.objects.filter(order=order, menu=self.menu_item).first()
+        self.assertEqual(order_item.menu, self.menu_item, "The cart should contain the correct menu item.")
+        self.assertEqual(order_item.quantity, 1, "The quantity of the item should be 1.")
+
