@@ -93,15 +93,13 @@ WSGI_APPLICATION = 'mammarasa.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mammarasa_db',
-        'USER': 'postgres',
-        'PASSWORD': 'wkwk123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.parse(
+        'postgresql://neondb_owner:npg_LjBNA53fCunY@ep-rough-paper-a5ckjjnd-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require',
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
 
 
 # Password validation
