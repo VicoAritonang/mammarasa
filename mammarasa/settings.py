@@ -85,10 +85,20 @@ WSGI_APPLICATION = 'mammarasa.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mammarasa_db',       # Ganti dengan nama database kamu
+        'USER': 'shintia',            # Ganti dengan username PostgreSQL
+        'PASSWORD': 'shintiacantik123',  # Ganti dengan password PostgreSQL kamu
+        'HOST': 'localhost',          # Default host
+        'PORT': '5432',               # Default port PostgreSQL
     }
 }
 
