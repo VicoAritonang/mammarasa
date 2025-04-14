@@ -4,116 +4,304 @@
 
 {% block content %}
   {% include 'main/navbar.html' %}
-  <body class="font-sans bg-gray-100 text-gray-800">
-    <h1 class="text-3xl font-bold text-gray-800 underline">Checkout</h1>
-    
-    <div class="container mx-auto px-4 py-8">
-        <div class="flex justify-center mb-10">
+  <body class="font-sans bg-gray-50 text-gray-800">
+    <!-- Improved header section with subtle background -->
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 py-6 border-b border-gray-200">
+      <div class="container mx-auto px-4">
+        <h1 class="text-3xl font-bold text-gray-800">Checkout</h1>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Enhanced progress tracker -->
+        <div class="flex justify-center mb-12">
             <div class="flex items-center">
                 <div class="flex flex-col items-center">
-                    <div class="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-bold">1</div>
-                    <div class="text-black font-medium mt-2">Order Details</div>
+                    <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold shadow-md">1</div>
+                    <div class="text-green-600 font-medium mt-2">Order Details</div>
+                </div>
+                <div class="w-32 h-1 bg-gray-300 mx-3">
+                    <div class="h-full bg-green-500 w-full"></div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold shadow-sm">2</div>
+                    <div class="text-gray-600 font-medium mt-2">Payment</div>
                 </div>
             </div>
         </div>
-        <div class="flex flex-col md:flex-row gap-8">
-            <div class="w-full md:w-2/3">
-                <form method="post" action="{% url 'checkout' order.id %}">
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="w-full lg:w-2/3">
+                <form method="post" action="{% url 'checkout' order.id %}" class="space-y-6">
                     {% csrf_token %}
-                    <!-- Order Details Section -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Order Details</h3>
-                        
-                        <div class="flex items-center mb-6">
-                            {% if order.restoran.foto_restoran %}
-                                <img src="{{ order.restoran.foto_restoran.url }}" alt="{{ order.restoran.nama_restoran }}" class="w-14 h-14 rounded-full object-cover mr-4">
-                            {% else %}
-                                <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                                    <span class="text-gray-500 text-lg">R</span>
+                    <!-- Order Details Section - Enhanced with better shadows and styling -->
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden">
+                        <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Order Details</h3>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center mb-6">
+                                {% if order.restoran.foto_restoran %}
+                                    <img src="{{ order.restoran.foto_restoran.url }}" alt="{{ order.restoran.nama_restoran }}" class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-white shadow-sm">
+                                {% else %}
+                                    <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mr-4 border-2 border-white shadow-sm">
+                                        <span class="text-gray-500 text-lg">R</span>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="text-xl font-semibold text-gray-800">{{ order.restoran.nama_restoran }}</div>
+                                    <div class="text-gray-500 flex items-center">
+                                        <i class="fas fa-envelope text-xs mr-1"></i> {{ order.restoran.pemilik_restoran.email }}
+                                    </div>
                                 </div>
-                            {% endif %}
-                            <div>
-                                <div class="text-lg font-semibold">{{ order.restoran.nama_restoran }}</div>
-                                <div class="text-gray-600">{{ order.restoran.pemilik_restoran.email }}</div>
+                            </div>
+
+                            <div class="space-y-4">
+                                {% for item in order_items %}
+                                    <div class="flex items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 px-2 rounded-lg">
+                                        {% if item.menu.foto_makanan %}
+                                            <img src="{{ item.menu.foto_makanan.url }}" alt="{{ item.menu.nama_menu }}" class="w-16 h-16 rounded-lg object-cover mr-4 shadow-sm">
+                                        {% else %}
+                                            <div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center mr-4 shadow-sm">
+                                                <span class="text-gray-500">Food</span>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="flex-1">
+                                            <div class="font-semibold text-gray-800">{{ item.menu.nama_menu }}</div>
+                                            <div class="text-gray-500 text-sm">Rp {{ item.menu.harga_makanan }}</div>
+                                        </div>
+
+                                        <div class="bg-gray-100 text-gray-700 font-medium px-3 py-1 rounded-full mx-4">
+                                            x{{ item.quantity }}
+                                        </div>
+
+                                        <div class="font-bold text-gray-800 w-24 text-right">
+                                            Rp {{ item.total_price }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
-                        
-                        <div>
-                            {% for item in order_items %}
-                                <div class="flex items-center py-4 border-b border-gray-200">
-                                    {% if item.menu.foto_makanan %}
-                                        <img src="{{ item.menu.foto_makanan.url }}" alt="{{ item.menu.nama_menu }}" class="w-14 h-14 rounded-lg object-cover mr-4">
-                                    {% else %}
-                                        <div class="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center mr-4">
-                                            <span class="text-gray-500">Food</span>
+                    </div>
+
+                    <!-- Delivery Information Section - Enhanced with better layout and styling -->
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden">
+                        <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Delivery Information</h3>
+                        </div>
+
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label for="name" class="block font-medium mb-2 text-gray-700">Full Name</label>
+                                <div class="relative">
+                                    <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 bg-white transition-all" id="name" name="name" value="{{ user.username }}" required>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="phone" class="block font-medium mb-2 text-gray-700">Phone Number</label>
+                                <div class="relative">
+                                    <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="tel" class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 bg-white transition-all" id="phone" name="phone" value="{{ user.phone_number }}" required>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="email" class="block font-medium mb-2 text-gray-700">Email Address</label>
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="email" class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 bg-white transition-all" id="email" name="email" value="{{ user.email }}" required>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="address" class="block font-medium mb-2 text-gray-700">Delivery Address</label>
+                                <div class="relative">
+                                    <i class="fas fa-map-marker-alt absolute left-4 top-4 text-gray-400"></i>
+                                    <textarea class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 bg-white transition-all" id="address" name="address" rows="3" required>{{ user.address }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="notes" class="block font-medium mb-2 text-gray-700">Order Notes (Optional)</label>
+                                <div class="relative">
+                                    <i class="fas fa-sticky-note absolute left-4 top-4 text-gray-400"></i>
+                                    <textarea class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 bg-white transition-all" id="notes" name="notes" rows="2" placeholder="Any special instructions for your order?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Section - Enhanced with better visual feedback -->
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden">
+                        <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-6">
+                            <h3 class="text-xl font-semibold text-gray-800">Payment Method</h3>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="payment-method active border-2 border-green-500 hover:border-green-600 rounded-xl p-5 cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-md bg-green-50" data-method="cash">
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-green-100 text-green-600 w-14 h-14 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                                            <i class="fas fa-money-bill-wave text-2xl"></i>
                                         </div>
-                                    {% endif %}
-                                    
-                                    <div class="flex-1">
-                                        <div class="font-semibold">{{ item.menu.nama_menu }}</div>
-                                        <div class="text-gray-600 text-sm">Rp {{ item.menu.harga_makanan }}</div>
-                                    </div>
-                                    
-                                    <div class="text-gray-600 mx-4">
-                                        x{{ item.quantity }}
-                                    </div>
-                                    
-                                    <div class="font-semibold text-gray-800 w-24 text-right">
-                                        Rp {{ item.total_price }}
+                                        <div class="font-semibold text-gray-800">Cash</div>
+                                        <div class="text-xs text-gray-500 mt-1">Pay on delivery</div>
                                     </div>
                                 </div>
-                            {% endfor %}
+
+                                <div class="payment-method border-2 border-gray-200 hover:border-green-600 rounded-xl p-5 cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-md" data-method="transfer">
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gray-100 text-gray-600 w-14 h-14 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                                            <i class="fas fa-university text-2xl"></i>
+                                        </div>
+                                        <div class="font-semibold text-gray-800">Bank Transfer</div>
+                                        <div class="text-xs text-gray-500 mt-1">Pay via bank account</div>
+                                    </div>
+                                </div>
+
+                                <div class="payment-method border-2 border-gray-200 hover:border-green-600 rounded-xl p-5 cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-md" data-method="ewallet">
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-gray-100 text-gray-600 w-14 h-14 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                                            <i class="fas fa-wallet text-2xl"></i>
+                                        </div>
+                                        <div class="font-semibold text-gray-800">E-Wallet</div>
+                                        <div class="text-xs text-gray-500 mt-1">DANA, OVO, GoPay</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="payment_method" id="payment_method" value="cash">
                         </div>
-                        
-                        <div class="mb-4 mt-6">
-                            <label for="notes" class="block font-semibold mb-2 text-gray-700">Order Notes (Optional)</label>
-                            <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400" id="notes" name="notes" rows="2" placeholder="Any special instructions for your order?"></textarea>
-                        </div>
-                        
-                        <!-- Hidden inputs for required fields -->
-                        <input type="hidden" id="name" name="name" value="{{ user.username }}">
-                        <input type="hidden" id="phone" name="phone" value="{{ user.phone_number }}">
-                        <input type="hidden" id="address" name="address" value="{{ user.address }}">
-                        <input type="hidden" name="payment_method" id="payment_method" value="cash">
                     </div>
             </div>
-            
-            <!-- Order Summary Section -->
-            <div class="w-full md:w-1/3">
-                <div class="bg-gray-800 rounded-lg shadow-md p-6 text-white">
-                    <h3 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-600">Order Summary</h3>
-                    
-                    <div class="flex justify-between mb-4">
-                        <div>Subtotal</div>
-                        <div>Rp {{ order.subtotal }}</div>
+
+            <!-- Order Summary Section - Enhanced with better styling -->
+            <div class="w-full lg:w-1/3">
+                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden sticky top-4">
+                    <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Order Summary</h3>
                     </div>
-                    
-                    <div class="flex justify-between mb-4">
-                        <div>Service Fee</div>
-                        <div>Rp {{ order.service_fee }}</div>
+
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="text-gray-600">Subtotal</div>
+                            <div class="text-gray-800 font-medium">Rp {{ order.subtotal }}</div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div class="text-gray-600">Service Fee</div>
+                            <div class="text-gray-800 font-medium">Rp {{ order.service_fee }}</div>
+                        </div>
+
+                        <!-- Enhanced total section -->
+                        <div class="flex justify-between items-center pt-4 mt-2 border-t border-gray-200">
+                            <div class="text-lg font-semibold text-gray-800">Total</div>
+                            <div class="text-xl font-bold text-green-600">Rp {{ order.total_price }}</div>
+                        </div>
+
+                        <!-- Enhanced secure checkout notice -->
+                        <div class="bg-green-50 text-green-700 p-3 rounded-lg flex items-center text-sm mt-4">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span>Secure checkout with encrypted payment processing</span>
+                        </div>
+
+                        <!-- Change the gradient button to a solid color -->
+                        <button
+                            type="submit"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl mt-4 flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+                        >
+                            <i class="fas fa-credit-card mr-2 text-lg"></i>
+                            <span class="text-lg">Bayar Sekarang</span>
+                        </button>
+
+                        <a href="{% url 'view_cart' order.restoran.id %}" class="block text-center text-gray-600 hover:text-gray-800 mt-4 transition-colors duration-300 py-2">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Cart
+                        </a>
                     </div>
-                    
-                    <!-- Total (label & nominal sama-sama beige) -->
-                    <div class="flex justify-between font-semibold text-lg pt-4 mt-4 border-t border-gray-600 text-[#f5f5dc]">
-                        <div>Total</div>
-                        <div>Rp {{ order.total_price }}</div>
+
+                    <!-- Estimated delivery time -->
+                    <div class="bg-gray-50 p-4 border-t border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-truck text-gray-500"></i>
+                            </div>
+                            <div>
+                                <div class="text-gray-600 text-sm">Estimated Delivery</div>
+                                <div class="font-semibold">30-45 minutes</div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Tombol "Bayar Sekarang" warna beige -->
-                    <button 
-                        type="submit"
-                        class="w-full bg-[#f5f5dc] hover:bg-[#e2e2c6] text-gray-800 font-semibold py-3 px-4 rounded-lg mt-6 flex items-center justify-center"
-                    >
-                        <i class="fas fa-wallet mr-2"></i> Bayar Sekarang
-                    </button>
-                </form>
-                
-                <a href="{% url 'view_cart' order.restoran.id %}" class="block text-center text-white hover:text-gray-200 mt-4">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Cart
-                </a>
                 </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const paymentMethodInput = document.getElementById('payment_method');
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Remove active class from all methods
+                    paymentMethods.forEach(m => {
+                        m.classList.remove('active');
+                        m.classList.remove('border-green-500');
+                        m.classList.remove('bg-green-50');
+                        m.classList.add('border-gray-200');
+
+                        // Reset icon container styles
+                        const iconContainer = m.querySelector('div > div');
+                        iconContainer.classList.remove('bg-green-100');
+                        iconContainer.classList.remove('text-green-600');
+                        iconContainer.classList.add('bg-gray-100');
+                        iconContainer.classList.add('text-gray-600');
+                    });
+
+                    // Add active class to clicked method
+                    this.classList.add('active');
+                    this.classList.add('border-green-500');
+                    this.classList.add('bg-green-50');
+                    this.classList.remove('border-gray-200');
+
+                    // Update icon container styles
+                    const iconContainer = this.querySelector('div > div');
+                    iconContainer.classList.remove('bg-gray-100');
+                    iconContainer.classList.remove('text-gray-600');
+                    iconContainer.classList.add('bg-green-100');
+                    iconContainer.classList.add('text-green-600');
+
+                    // Update hidden input value
+                    paymentMethodInput.value = this.getAttribute('data-method');
+                });
+            });
+
+            // Add subtle animations to page elements on load
+            const animateElements = document.querySelectorAll('.bg-white');
+            setTimeout(() => {
+                animateElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('animate-fade-in');
+                    }, index * 100);
+                });
+            }, 300);
+        });
+    </script>
+
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.4; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
   </body>
 {% endblock %}
