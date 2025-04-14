@@ -14,11 +14,6 @@
                     <div class="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-bold">1</div>
                     <div class="text-black font-medium mt-2">Order Details</div>
                 </div>
-                <div class="w-24 h-1 bg-gray-300 mx-2"></div>
-                <div class="flex flex-col items-center">
-                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-bold">2</div>
-                    <div class="text-gray-500 font-medium mt-2">Payment</div>
-                </div>
             </div>
         </div>
         <div class="flex flex-col md:flex-row gap-8">
@@ -69,54 +64,16 @@
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
-                    
-                    <!-- Delivery Information Section -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Delivery Information</h3>
                         
-                        <div class="mb-4">
-                            <label for="name" class="block font-semibold mb-2 text-gray-700">Full Name</label>
-                            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400" id="name" name="name" value="{{ user.username }}" required>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="phone" class="block font-semibold mb-2 text-gray-700">Phone Number</label>
-                            <input type="tel" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400" id="phone" name="phone" value="{{ user.phone_number }}" required>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="address" class="block font-semibold mb-2 text-gray-700">Delivery Address</label>
-                            <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400" id="address" name="address" rows="3" required>{{ user.address }}</textarea>
-                        </div>
-                        
-                        <div class="mb-4">
+                        <div class="mb-4 mt-6">
                             <label for="notes" class="block font-semibold mb-2 text-gray-700">Order Notes (Optional)</label>
                             <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400" id="notes" name="notes" rows="2" placeholder="Any special instructions for your order?"></textarea>
                         </div>
-                    </div>
-                    
-                    <!-- Payment Method Section -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Payment Method</h3>
                         
-                        <div class="flex flex-wrap gap-4 mb-4">
-                            <div class="flex-1 min-w-[120px] border border-gray-200 hover:border-gray-500 rounded-lg p-4 text-center cursor-pointer transition-colors payment-method active" data-method="cash">
-                                <i class="fas fa-money-bill-wave text-2xl mb-2 text-gray-600"></i>
-                                <div class="font-semibold">Cash</div>
-                            </div>
-                            
-                            <div class="flex-1 min-w-[120px] border border-gray-200 hover:border-gray-500 rounded-lg p-4 text-center cursor-pointer transition-colors payment-method" data-method="transfer">
-                                <i class="fas fa-university text-2xl mb-2 text-gray-600"></i>
-                                <div class="font-semibold">Bank Transfer</div>
-                            </div>
-                            
-                            <div class="flex-1 min-w-[120px] border border-gray-200 hover:border-gray-500 rounded-lg p-4 text-center cursor-pointer transition-colors payment-method" data-method="ewallet">
-                                <i class="fas fa-wallet text-2xl mb-2 text-gray-600"></i>
-                                <div class="font-semibold">E-Wallet</div>
-                            </div>
-                        </div>
-                        
+                        <!-- Hidden inputs for required fields -->
+                        <input type="hidden" id="name" name="name" value="{{ user.username }}">
+                        <input type="hidden" id="phone" name="phone" value="{{ user.phone_number }}">
+                        <input type="hidden" id="address" name="address" value="{{ user.address }}">
                         <input type="hidden" name="payment_method" id="payment_method" value="cash">
                     </div>
             </div>
@@ -158,33 +115,5 @@
             </div>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const paymentMethods = document.querySelectorAll('.payment-method');
-            const paymentMethodInput = document.getElementById('payment_method');
-            
-            paymentMethods.forEach(method => {
-                method.addEventListener('click', function() {
-                    // Remove active class from all methods
-                    paymentMethods.forEach(m => {
-                        m.classList.remove('active');
-                        m.classList.remove('border-gray-500');
-                        m.classList.remove('bg-gray-100');
-                        m.classList.add('border-gray-200');
-                    });
-                    
-                    // Add active class to clicked method
-                    this.classList.add('active');
-                    this.classList.add('border-gray-500');
-                    this.classList.add('bg-gray-100');
-                    this.classList.remove('border-gray-200');
-                    
-                    // Update hidden input value
-                    paymentMethodInput.value = this.getAttribute('data-method');
-                });
-            });
-        });
-    </script>
   </body>
 {% endblock %}
