@@ -93,10 +93,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mammarasa_db',
-        'USER': 'postgres',
-        'PASSWORD': 'abbycantik14',
-        'HOST': 'localhost',
-        'PORT': '5432',
     }
 }
 
