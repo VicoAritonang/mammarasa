@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,7 +47,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_totp',
     'social_django',
     'auditlog',
-    'timedelta',
+    # 'timedelta',
     'django_extensions',  # For TLS support on dev server
 ]
 
@@ -90,17 +89,12 @@ WSGI_APPLICATION = 'mammarasa.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-import dj_database_url
-
 DATABASES = {
-    'default': dj_database_url.parse(
-        'postgresql://neondb_owner:npg_LjBNA53fCunY@ep-rough-paper-a5ckjjnd-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require',
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mammarasa_db',
+    }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

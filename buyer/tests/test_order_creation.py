@@ -1,5 +1,5 @@
 import logging
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from restoran.models import Restoran, Menu
@@ -12,13 +12,34 @@ logger = logging.getLogger(__name__)
 class OrderCreationTest(TestCase):
 
     def setUp(self):
-        # Create a buyer user
-        self.user = User.objects.create_user(username='testbuyer', password='password', role='buyer')
-        self.restoran = Restoran.objects.create(user=self.user, nama_restoran='Test Restaurant')
-        self.menu_item = Menu.objects.create(nama_menu="Test Menu Item", harga_makanan=100, restoran=self.restoran)
+        self.client = Client()
 
-        # Create a buyer instance for the user
+        # Create user (email = username karena USERNAME_FIELD = 'email')
+        self.user = User.objects.create_user(
+            email='buyer@example.com',
+            name='Buyer Test',
+            password='Password123!',
+            role='buyer'
+        )
+
+        # Login with correct credentials (username = email karena USERNAME_FIELD = 'email')
+        self.client.login(username='buyer@example.com', password='Password123!')
+
+        # Setup restoran, menu, buyer, order, item
+        self.restoran = Restoran.objects.create(
+            nama_restoran='Mamma Rasa',
+            user=self.user  # <--- ini kunci fix-nya
+        )
+
+        self.menu = Menu.objects.create(nama_menu='Nasi Goreng', harga_makanan=20000, restoran=self.restoran)
+
         self.buyer = Buyer.objects.create(user=self.user)
+        self.order = Order.objects.create(buyer=self.buyer, restoran=self.restoran, status=False)
+        self.item = OrderItem.objects.create(order=self.order, menu=self.menu, quantity=1)
+
+        self.view_cart_url = reverse('view_cart', args=[str(self.restoran.id)])
+        self.update_url = reverse('update_cart_item', args=[str(self.item.id)])
+        self.checkout_url = reverse('checkout', args=[str(self.order.id)])
 
     def test_add_to_cart_and_create_order(self):
         """Test that adding an item to the cart creates an order."""

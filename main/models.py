@@ -8,6 +8,7 @@ from datetime import timedelta
 from .utils import encrypt_data, decrypt_data
 
 class UserManager(BaseUserManager):
+
     def create_user(self, email, name, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
@@ -100,3 +101,4 @@ class LoginAttempt(models.Model):
 # Register models with auditlog
 auditlog.register(User)
 auditlog.register(LoginAttempt)
+
